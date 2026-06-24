@@ -1,0 +1,364 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  super_admin
+  business_owner
+  sales_manager
+}
+
+enum CampaignStatus {
+  draft
+  scheduled
+  running
+  paused
+  completed
+  failed
+}
+
+enum CallStatus {
+  queued
+  ringing
+  in_progress
+  completed
+  failed
+  no_answer
+  busy
+}
+
+enum LeadOutcome {
+  new
+  converted
+  payment_link_sent
+  payment_completed
+  interested_callback
+  not_interested
+  wrong_number
+  no_answer
+  busy
+  do_not_call
+  failed
+}
+
+enum PaymentStatus {
+  created
+  link_sent
+  paid
+  failed
+  expired
+  refunded
+}
+
+enum WalletTransactionType {
+  recharge
+  debit_call
+  credit_adjustment
+  refund
+  promo_free_call
+}
+
+enum ProviderType {
+  telephony
+  llm
+  payment
+  messaging
+  storage
+}
+
+model Organization {
+  id                    String   @id @default(uuid())
+  name                  String
+  industry              String?
+  status                String   @default("active")
+  firstCallFreeUsed     Boolean  @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  users                 User[]
+  businessProfiles      BusinessProfile[]
+  subscriptions         Subscription[]
+  wallet                Wallet?
+  leads                 Lead[]
+  leadUploadBatches     LeadUploadBatch[]
+  campaigns             Campaign[]
+  calls                 Call[]
+  payments              Payment[]
+  providerConfigs       ProviderConfig[]
+  auditLogs             AuditLog[]
+  optOutNumbers         OptOutNumber[]
+}
+
+model User {
+  id                  String       @id @default(uuid())
+  organizationId      String?
+  organization        Organization? @relation(fields: [organizationId], references: [id])
+  email               String       @unique
+  phone               String?
+  passwordHash        String
+  role                Role         @default(business_owner)
+  isEmailVerified     Boolean      @default(false)
+  isPhoneVerified     Boolean      @default(false)
+  resetTokenHash      String?
+  resetTokenExpiresAt DateTime?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+}
+
+model BusinessProfile {
+  id                    String       @id @default(uuid())
+  organizationId         String
+  organization           Organization @relation(fields: [organizationId], references: [id])
+  businessName           String
+  industry               String
+  description            String
+  productsServices       Json
+  pricing                Json
+  offersDiscounts        Json?
+  faqs                   Json?
+  refundPaymentPolicy    String?
+  preferredLanguage      String       @default("hi-IN")
+  tone                   String       @default("friendly")
+  businessHours          Json
+  callbackRules          Json?
+  paymentGatewayConfig   Json?
+  humanHandoffNumber     String?
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+  campaigns              Campaign[]
+}
+
+model Subscription {
+  id              String       @id @default(uuid())
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  planName        String
+  status          String       @default("trial")
+  monthlyFeePaise Int          @default(0)
+  includedMinutes Int          @default(0)
+  startsAt        DateTime     @default(now())
+  endsAt          DateTime?
+  createdAt       DateTime     @default(now())
+}
+
+model Wallet {
+  id                 String       @id @default(uuid())
+  organizationId     String       @unique
+  organization       Organization @relation(fields: [organizationId], references: [id])
+  balancePaise       Int          @default(0)
+  lowBalancePaise    Int          @default(10000)
+  perMinutePricePaise Int         @default(100)
+  telephonyCostPaise Int          @default(40)
+  aiCostPaise        Int          @default(30)
+  platformMarginPaise Int         @default(30)
+  updatedAt          DateTime     @updatedAt
+  transactions       WalletTransaction[]
+}
+
+model WalletTransaction {
+  id              String                @id @default(uuid())
+  walletId        String
+  wallet          Wallet                @relation(fields: [walletId], references: [id])
+  type            WalletTransactionType
+  amountPaise     Int
+  balanceAfterPaise Int
+  reference       String?
+  metadata        Json?
+  createdAt       DateTime              @default(now())
+}
+
+model LeadUploadBatch {
+  id              String       @id @default(uuid())
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  fileName        String
+  totalRows       Int          @default(0)
+  validRows       Int          @default(0)
+  invalidRows     Int          @default(0)
+  status          String       @default("previewed")
+  validationReport Json?
+  createdAt       DateTime     @default(now())
+  leads           Lead[]
+}
+
+model Lead {
+  id                 String       @id @default(uuid())
+  organizationId      String
+  organization        Organization @relation(fields: [organizationId], references: [id])
+  uploadBatchId       String?
+  uploadBatch         LeadUploadBatch? @relation(fields: [uploadBatchId], references: [id])
+  name               String
+  phone              String
+  email              String?
+  city               String?
+  productInterest    String?
+  budget             String?
+  notes              String?
+  consentStatus      String
+  preferredLanguage  String?
+  status             LeadOutcome @default(new)
+  isDuplicate        Boolean     @default(false)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  campaignLeads      CampaignLead[]
+  calls              Call[]
+  payments           Payment[]
+
+  @@index([organizationId, phone])
+}
+
+model Campaign {
+  id                         String         @id @default(uuid())
+  organizationId              String
+  organization                Organization   @relation(fields: [organizationId], references: [id])
+  businessProfileId           String
+  businessProfile             BusinessProfile @relation(fields: [businessProfileId], references: [id])
+  name                        String
+  objective                   String
+  status                      CampaignStatus @default(draft)
+  maxCallAttempts             Int            @default(2)
+  retryDelayMinutes           Int            @default(60)
+  callWindow                  Json
+  language                    String         @default("hi-IN")
+  paymentCollectionEnabled    Boolean        @default(false)
+  humanHandoffEnabled         Boolean        @default(true)
+  consentConfirmed            Boolean        @default(false)
+  dndSafeMode                 Boolean        @default(true)
+  recordingDisclosureEnabled  Boolean        @default(true)
+  optOutEnforcementEnabled    Boolean        @default(true)
+  createdAt                   DateTime       @default(now())
+  updatedAt                   DateTime       @updatedAt
+  campaignLeads               CampaignLead[]
+  calls                       Call[]
+}
+
+model CampaignLead {
+  id             String      @id @default(uuid())
+  campaignId     String
+  campaign       Campaign    @relation(fields: [campaignId], references: [id])
+  leadId         String
+  lead           Lead        @relation(fields: [leadId], references: [id])
+  attempts       Int         @default(0)
+  outcome        LeadOutcome @default(new)
+  lastCallAt     DateTime?
+  callbackAt     DateTime?
+  interestLevel  Int?
+  aiNotes        String?
+
+  @@unique([campaignId, leadId])
+}
+
+model Call {
+  id                  String       @id @default(uuid())
+  organizationId       String
+  organization         Organization @relation(fields: [organizationId], references: [id])
+  campaignId           String
+  campaign             Campaign     @relation(fields: [campaignId], references: [id])
+  leadId               String
+  lead                 Lead         @relation(fields: [leadId], references: [id])
+  provider             String       @default("mock")
+  providerCallId       String?
+  status               CallStatus   @default(queued)
+  outcome              LeadOutcome  @default(new)
+  startedAt            DateTime?
+  endedAt              DateTime?
+  durationSeconds      Int          @default(0)
+  costPaise            Int          @default(0)
+  recordingUrl         String?
+  transcriptUrl        String?
+  latencyMs            Int?
+  disclosurePlayed     Boolean      @default(false)
+  optOutDetected       Boolean      @default(false)
+  createdAt            DateTime     @default(now())
+  transcript           CallTranscript?
+  events               CallEvent[]
+}
+
+model CallTranscript {
+  id         String   @id @default(uuid())
+  callId     String   @unique
+  call       Call     @relation(fields: [callId], references: [id])
+  transcript Json
+  summary    String?
+  sentiment  String?
+  createdAt  DateTime @default(now())
+}
+
+model CallEvent {
+  id        String   @id @default(uuid())
+  callId    String
+  call      Call     @relation(fields: [callId], references: [id])
+  type      String
+  payload   Json
+  createdAt DateTime @default(now())
+}
+
+model Payment {
+  id                 String        @id @default(uuid())
+  organizationId      String
+  organization        Organization  @relation(fields: [organizationId], references: [id])
+  leadId             String?
+  lead               Lead?         @relation(fields: [leadId], references: [id])
+  provider           String
+  providerPaymentId  String?
+  paymentLink        String?
+  amountPaise        Int
+  status             PaymentStatus @default(created)
+  description        String
+  metadata           Json?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  webhooks           PaymentWebhook[]
+}
+
+model PaymentWebhook {
+  id          String   @id @default(uuid())
+  paymentId   String?
+  payment     Payment? @relation(fields: [paymentId], references: [id])
+  provider    String
+  signatureOk Boolean  @default(false)
+  payload     Json
+  createdAt   DateTime @default(now())
+}
+
+model ProviderConfig {
+  id              String       @id @default(uuid())
+  organizationId  String?
+  organization    Organization? @relation(fields: [organizationId], references: [id])
+  type            ProviderType
+  provider        String
+  isActive        Boolean      @default(false)
+  encryptedConfig String
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+model AuditLog {
+  id              String       @id @default(uuid())
+  organizationId  String?
+  organization    Organization? @relation(fields: [organizationId], references: [id])
+  actorUserId     String?
+  action          String
+  entityType      String
+  entityId        String?
+  ipAddress       String?
+  userAgent       String?
+  metadata        Json?
+  createdAt       DateTime     @default(now())
+}
+
+model OptOutNumber {
+  id              String       @id @default(uuid())
+  organizationId  String?
+  organization    Organization? @relation(fields: [organizationId], references: [id])
+  phone           String
+  reason          String?
+  source          String       @default("call")
+  createdAt       DateTime     @default(now())
+
+  @@unique([organizationId, phone])
+}

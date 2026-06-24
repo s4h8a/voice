@@ -1,0 +1,4 @@
+name,phone,email,city,product_interest,budget,notes,consent_status,preferred_language
+Aarav Sharma,9876543210,aarav@example.com,Delhi,Full Stack Course,15000,Asked for EMI,consented,hi-IN
+Priya Nair,9988776655,priya@example.com,Bengaluru,Admissions counselling,25000,Callback after work,consented,en-IN
+Rohan Gupta,9123456789,rohan@example.com,Mumbai,Course demo,10000,Do not call unless consented,consented,hi-IN

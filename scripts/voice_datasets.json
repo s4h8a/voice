@@ -1,0 +1,24 @@
+{
+  "purpose": "Legal speech-to-text training/evaluation sources for Indian voice-agent experiments. Check each dataset license before commercial model training.",
+  "default_output_dir": "data/voice",
+  "datasets": [
+    {
+      "id": "google/fleurs",
+      "subsets": ["hi_in", "en_in", "bn_in", "ta_in", "te_in", "mr_in", "gu_in", "kn_in", "ml_in"],
+      "splits": ["train", "validation", "test"],
+      "license_note": "FLEURS dataset on Hugging Face; verify current license and attribution requirements."
+    },
+    {
+      "id": "mozilla-foundation/common_voice_17_0",
+      "subsets": ["hi", "en", "bn", "ta", "te", "mr", "gu", "kn", "ml"],
+      "splits": ["train", "validation", "test"],
+      "license_note": "Common Voice has open licenses but may require agreement to terms on Hugging Face."
+    },
+    {
+      "id": "ai4bharat/IndicVoices",
+      "subsets": ["all"],
+      "splits": ["train"],
+      "license_note": "Indian language speech corpus. Confirm accepted terms and commercial permissions before training."
+    }
+  ]
+}
