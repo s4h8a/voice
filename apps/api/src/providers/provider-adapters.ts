@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadGatewayException, BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Campaign, Lead } from '@prisma/client';
 import { createHmac } from 'crypto';
@@ -6,7 +6,7 @@ import { ConversationTurn, LLMProvider, PaymentProvider, TelephonyProvider } fro
 
 function requireEnv(config: ConfigService, key: string) {
   const value = config.get<string>(key);
-  if (!value) throw new Error(`${key} is required for the selected provider`);
+  if (!value) throw new BadRequestException(`${key} is required for the selected provider`);
   return value;
 }
 
@@ -44,7 +44,7 @@ export class ExotelAdapter implements TelephonyProvider {
       params.set('CallType', 'trans');
     } else {
       const agentNumber = this.config.get<string>('EXOTEL_AGENT_NUMBER') || (campaign as any).businessProfile?.humanHandoffNumber;
-      if (!agentNumber) throw new Error('EXOTEL_FLOW_URL or EXOTEL_AGENT_NUMBER is required for real Exotel calls');
+      if (!agentNumber) throw new BadRequestException('EXOTEL_FLOW_URL or EXOTEL_AGENT_NUMBER is required for real Exotel calls');
       params.set('From', toE164India(agentNumber));
       params.set('To', toE164India(lead.phone));
       params.set('CallerId', callerId);
@@ -136,7 +136,7 @@ export class PlivoAdapter implements TelephonyProvider {
     const authToken = requireEnv(this.config, 'PLIVO_AUTH_TOKEN');
     const from = requireEnv(this.config, 'PLIVO_FROM_NUMBER');
     const answerUrl = this.config.get<string>('PLIVO_ANSWER_URL') || callbackUrl(this.config, '/api/telephony/plivo/answer');
-    if (!answerUrl) throw new Error('PLIVO_ANSWER_URL or PUBLIC_API_BASE_URL is required for Plivo calls');
+    if (!answerUrl) throw new BadRequestException('PLIVO_ANSWER_URL or PUBLIC_API_BASE_URL is required for Plivo calls');
     const data = await postJson(
       `https://api.plivo.com/v1/Account/${authId}/Call/`,
       {
@@ -252,13 +252,13 @@ export class OpenRouterAdapter extends BaseLLMProvider {
       'failed',
     ];
     const outcome = allowed.find((x) => result.includes(x));
-    if (!outcome) throw new Error(`OpenRouter returned invalid outcome: ${result}`);
+    if (!outcome) throw new BadGatewayException(`OpenRouter returned invalid outcome: ${result}`);
     return outcome;
   }
 
   private async chat(messages: { role: 'system' | 'user' | 'assistant'; content: string }[]) {
     const key = this.config.get<string>('OPENROUTER_API_KEY');
-    if (!key) throw new Error('OPENROUTER_API_KEY is required');
+    if (!key) throw new BadRequestException('OPENROUTER_API_KEY is required');
     const baseUrl = this.config.get<string>('OPENROUTER_BASE_URL') || 'https://openrouter.ai/api/v1';
     const model = this.config.get<string>('OPENROUTER_MODEL') || 'nvidia/nemotron-3-ultra-550b-a55b:free';
     const res = await fetch(`${baseUrl}/chat/completions`, {
@@ -271,7 +271,7 @@ export class OpenRouterAdapter extends BaseLLMProvider {
       },
       body: JSON.stringify({ model, messages, temperature: 0.4, max_tokens: 420 }),
     });
-    if (!res.ok) throw new Error(`OpenRouter error ${res.status}: ${await res.text()}`);
+    if (!res.ok) throw new BadGatewayException(`OpenRouter error ${res.status}: ${await res.text()}`);
     const json = (await res.json()) as any;
     return String(json?.choices?.[0]?.message?.content || '').trim();
   }
@@ -318,7 +318,7 @@ export class RazorpayAdapter implements PaymentProvider {
 
 export class CashfreeAdapter implements PaymentProvider {
   async createPaymentLink(): Promise<{ providerPaymentId: string; paymentLink: string }> {
-    throw new Error('Cashfree live adapter is not configured. Use PAYMENT_PROVIDER=razorpay or add Cashfree checkout configuration.');
+    throw new BadRequestException('Cashfree live adapter is not configured. Use PAYMENT_PROVIDER=razorpay or add Cashfree checkout configuration.');
   }
   async verifyWebhook() {
     return false;
@@ -330,7 +330,7 @@ export class CashfreeAdapter implements PaymentProvider {
 
 export class PhonePeAdapter implements PaymentProvider {
   async createPaymentLink(): Promise<{ providerPaymentId: string; paymentLink: string }> {
-    throw new Error('PhonePe live adapter is not configured. Use PAYMENT_PROVIDER=razorpay or add PhonePe merchant checkout configuration.');
+    throw new BadRequestException('PhonePe live adapter is not configured. Use PAYMENT_PROVIDER=razorpay or add PhonePe merchant checkout configuration.');
   }
   async verifyWebhook() {
     return false;
@@ -342,7 +342,7 @@ export class PhonePeAdapter implements PaymentProvider {
 
 export class DisabledPaymentProvider implements PaymentProvider {
   async createPaymentLink(): Promise<{ providerPaymentId: string; paymentLink: string }> {
-    throw new Error('Payments are disabled while BILLING_MODE=free. Enable wallet billing before creating payment links.');
+    throw new BadRequestException('Payments are disabled while BILLING_MODE=free. Enable wallet billing before creating payment links.');
   }
   async verifyWebhook() {
     return false;
@@ -397,7 +397,7 @@ async function parseProviderResponse(res: Response) {
     data = { raw: text };
   }
   if (!res.ok) {
-    throw new Error(`Telephony provider error ${res.status}: ${JSON.stringify(data).slice(0, 800)}`);
+    throw new BadGatewayException(`Telephony provider error ${res.status}: ${JSON.stringify(data).slice(0, 800)}`);
   }
   return data;
 }

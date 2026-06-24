@@ -39,6 +39,9 @@ export class CallsService {
     const organization = await this.prisma.organization.findUniqueOrThrow({ where: { id: organizationId } });
     const wallet = await this.prisma.wallet.findUnique({ where: { organizationId } });
     const phone = String(input.phone || '').replace(/\D/g, '').replace(/^91/, '');
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      throw new BadRequestException('Enter a valid 10 digit Indian mobile number starting with 6, 7, 8, or 9');
+    }
     const businessProfile =
       (await this.prisma.businessProfile.findFirst({ where: { organizationId } })) ||
       (await this.prisma.businessProfile.create({

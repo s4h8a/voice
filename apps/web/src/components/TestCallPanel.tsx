@@ -33,7 +33,7 @@ export function TestCallPanel() {
         },
         body: JSON.stringify({ name, phone, preferredLanguage, consentConfirmed: consentConfirmed && disclosureConfirmed }),
       });
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) throw new Error(await readApiError(res));
       const data = await res.json();
       setResult(`Call request created: ${data.callId}`);
     } catch (err) {
@@ -94,4 +94,17 @@ export function TestCallPanel() {
       </div>
     </form>
   );
+}
+
+async function readApiError(res: Response) {
+  const text = await res.text();
+  try {
+    const data = JSON.parse(text);
+    if (Array.isArray(data.message)) return data.message.join(', ');
+    if (data.message) return String(data.message);
+    if (data.error) return String(data.error);
+  } catch {
+    return text || `Request failed with ${res.status}`;
+  }
+  return text || `Request failed with ${res.status}`;
 }

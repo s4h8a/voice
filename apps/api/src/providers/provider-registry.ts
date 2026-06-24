@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { BaseLLMProvider, CashfreeAdapter, DisabledPaymentProvider, ExotelAdapter, OpenRouterAdapter, PhonePeAdapter, PlivoAdapter, RazorpayAdapter, TwilioAdapter } from './provider-adapters';
 import { LLMProvider, PaymentProvider, TelephonyProvider } from './interfaces';
@@ -28,14 +28,14 @@ export class ProviderRegistry {
     if (provider === 'exotel') return this.exotel;
     if (provider === 'twilio') return this.twilio;
     if (provider === 'plivo') return this.plivo;
-    throw new Error(`Unsupported TELEPHONY_PROVIDER: ${provider}. Use exotel, twilio, or plivo.`);
+    throw new BadRequestException(`Unsupported TELEPHONY_PROVIDER: ${provider}. Use exotel, twilio, or plivo.`);
   }
   getTelephonyName() {
     return (this.config.get<string>('TELEPHONY_PROVIDER') || 'exotel').toLowerCase();
   }
   getLLM(): LLMProvider {
     if (this.config.get<string>('LLM_PROVIDER') === 'openrouter') return this.openRouter;
-    throw new Error('LLM_PROVIDER must be openrouter in real mode');
+    throw new BadRequestException('LLM_PROVIDER must be openrouter in real mode');
   }
   getPayment(): PaymentProvider {
     if (this.config.get<string>('BILLING_MODE') !== 'wallet') return this.disabledPayment;
@@ -43,7 +43,7 @@ export class ProviderRegistry {
     if (provider === 'razorpay') return this.razorpay;
     if (provider === 'cashfree') return this.cashfree;
     if (provider === 'phonepe') return this.phonepe;
-    throw new Error(`Unsupported PAYMENT_PROVIDER: ${provider}. Use razorpay, cashfree, or phonepe.`);
+    throw new BadRequestException(`Unsupported PAYMENT_PROVIDER: ${provider}. Use razorpay, cashfree, or phonepe.`);
   }
   getPaymentName() {
     return this.config.get<string>('BILLING_MODE') !== 'wallet'
