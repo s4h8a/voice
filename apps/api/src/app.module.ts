@@ -22,6 +22,7 @@ import { PaymentsController } from './modules/payments/payments.controller';
 import { PaymentsService } from './modules/payments/payments.service';
 import { CallsController } from './modules/calls/calls.controller';
 import { CallsService } from './modules/calls/calls.service';
+import { TelephonyWebhooksController } from './modules/telephony/telephony-webhooks.controller';
 import { AdminController } from './modules/admin/admin.controller';
 import { AdminService } from './modules/admin/admin.service';
 import { ProviderRegistry } from './providers/provider-registry';
@@ -55,6 +56,7 @@ import { CampaignProcessor } from './jobs/campaign.processor';
     WalletController,
     PaymentsController,
     CallsController,
+    TelephonyWebhooksController,
     AdminController,
   ],
   providers: [

@@ -17,7 +17,7 @@ export function RevenueChart() {
       <div className="mb-4 flex items-center justify-between">
         <div>
           <p className="text-sm font-semibold">Calling and payment trend</p>
-          <p className="text-xs text-muted">Demo campaign activity</p>
+          <p className="text-xs text-muted">Free beta campaign activity</p>
         </div>
       </div>
       <ResponsiveContainer width="100%" height="82%">

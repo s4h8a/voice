@@ -1,6 +1,6 @@
 # Deployment
 
-## Local Demo
+## Local Setup
 
 ```bash
 cp .env.example .env

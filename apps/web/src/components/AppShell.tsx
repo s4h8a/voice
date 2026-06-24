@@ -35,7 +35,7 @@ export function AppShell({ title, children, action }: { title: string; children:
           </span>
           <span>
             <span className="block text-sm font-semibold">AI Sales Calling Agent</span>
-            <span className="block text-xs text-muted">India demo workspace</span>
+            <span className="block text-xs text-muted">India free beta workspace</span>
           </span>
         </Link>
         <nav className="mt-7 space-y-1">

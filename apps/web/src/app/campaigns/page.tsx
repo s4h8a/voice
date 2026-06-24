@@ -5,8 +5,8 @@ import { DataTable } from '@/components/DataTable';
 import { StatusBadge } from '@/components/StatusBadge';
 
 const campaigns = [
-  { id: 'demo-1', name: 'Admissions June follow-up', profile: 'Sofron Academy', status: 'running', attempts: '2 max', language: 'hi-IN', payment: 'Enabled' },
-  { id: 'demo-2', name: 'UPI recharge winback', profile: 'Retail demo', status: 'draft', attempts: '1 max', language: 'en-IN', payment: 'Disabled' }
+  { id: 'campaign-1', name: 'Admissions June follow-up', profile: 'Sofron Academy', status: 'running', attempts: '2 max', language: 'hi-IN', payment: 'Free beta' },
+  { id: 'campaign-2', name: 'Consultation callback list', profile: 'Retail starter', status: 'draft', attempts: '1 max', language: 'en-IN', payment: 'Free beta' }
 ];
 
 export default function CampaignsPage() {
@@ -30,7 +30,7 @@ export default function CampaignsPage() {
             </label>
             <label className="block">
               <span className="text-sm font-medium">Objective</span>
-              <textarea className="focus-ring mt-1 min-h-24 w-full rounded-md border border-line px-3 py-3" defaultValue="Call consented leads, explain course offer, answer objections, send UPI payment link only when requested." />
+              <textarea className="focus-ring mt-1 min-h-24 w-full rounded-md border border-line px-3 py-3" defaultValue="Call consented leads, explain the offer, answer objections, detect interest, and schedule callback or human handoff." />
             </label>
             <div className="grid grid-cols-2 gap-3">
               <label className="block">

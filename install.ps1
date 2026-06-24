@@ -78,14 +78,14 @@ Write-Host "Generating Prisma client and syncing database schema..."
 npm run prisma:generate -w apps/api
 npm run db:push
 
-Write-Host "Seeding demo data..."
+Write-Host "Seeding starter data..."
 npm run db:seed
 
 Write-Host ""
 Write-Host "Installed successfully."
 Write-Host "Web: http://localhost:3000"
 Write-Host "API: http://localhost:4000/api"
-Write-Host "Demo login: owner@example.com / Demo@123456"
+Write-Host "Starter login: owner@example.com / Start@123456"
 
 if (-not $NoStart) {
   .\start.ps1

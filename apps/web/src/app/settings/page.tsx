@@ -23,7 +23,7 @@ export default function SettingsPage() {
               <label key={label} className="block">
                 <span className="text-sm font-medium">{label}</span>
                 <select className="focus-ring mt-1 w-full rounded-md border border-line px-3 py-3">
-                  <option>Demo mode</option>
+                  <option>Live provider</option>
                   <option>Production credential</option>
                 </select>
               </label>

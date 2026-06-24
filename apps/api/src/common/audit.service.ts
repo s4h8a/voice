@@ -13,6 +13,6 @@ export class AuditService {
     entityId?: string;
     metadata?: Record<string, unknown>;
   }) {
-    await this.prisma.auditLog.create({ data: input });
+    await this.prisma.auditLog.create({ data: input as any });
   }
 }

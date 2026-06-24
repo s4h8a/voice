@@ -52,7 +52,6 @@ Wallet routes:
 
 - `GET /wallet`
 - `POST /wallet/recharge`
-- `POST /wallet/recharge/manual-demo`
 - `GET /wallet/transactions`
 
 Admin routes:
@@ -85,4 +84,4 @@ Admin routes:
 }
 ```
 
-This creates a payment link. Wallet credit happens after verified payment webhook.
+This endpoint is disabled while `BILLING_MODE=free`. Enable `BILLING_MODE=wallet` before taking customer payments.

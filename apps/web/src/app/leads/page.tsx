@@ -6,7 +6,7 @@ import { StatusBadge } from '@/components/StatusBadge';
 const rows = [
   { id: '1', name: 'Aarav Sharma', phone: '9876543210', city: 'Delhi', consent: 'consented', interest: 'Full Stack Course' },
   { id: '2', name: 'Priya Nair', phone: '9988776655', city: 'Bengaluru', consent: 'consented', interest: 'Admissions counselling' },
-  { id: '3', name: 'Invalid row', phone: '12345', city: 'Mumbai', consent: 'missing_consent', interest: 'Demo' }
+  { id: '3', name: 'Invalid row', phone: '12345', city: 'Mumbai', consent: 'missing_consent', interest: 'Course consultation' }
 ];
 
 export default function LeadsPage() {

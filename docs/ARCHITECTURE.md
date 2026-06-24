@@ -22,9 +22,16 @@
 
 ## Provider Interfaces
 
-- `TelephonyProvider`: Exotel, Twilio, Plivo, mock.
-- `LLMProvider`: demo, OpenRouter, OpenAI realtime, Gemini, local model placeholders.
-- `PaymentProvider`: Razorpay, Cashfree, PhonePe, mock UPI.
+- `TelephonyProvider`: Exotel, Twilio, Plivo. Select with `TELEPHONY_PROVIDER`.
+- `LLMProvider`: OpenRouter.
+- `PaymentProvider`: Razorpay by default; Cashfree/PhonePe hooks are reserved for merchant-specific checkout configuration.
+
+## Live Dialing Modes
+
+- Exotel flow mode: dials the customer and routes them to an Exotel flow/app using `EXOTEL_FLOW_URL` or `EXOTEL_APP_ID`.
+- Exotel bridge mode: dials an agent/handoff number first, then connects the customer using `EXOTEL_AGENT_NUMBER`.
+- Twilio mode: creates an outbound call from `TWILIO_FROM_NUMBER`; if no `TWILIO_TWIML_URL` is set it uses inline TwiML for a smoke call.
+- Plivo mode: creates an outbound call using `PLIVO_FROM_NUMBER` and requires `PLIVO_ANSWER_URL` or `PUBLIC_API_BASE_URL`.
 
 ## Private Backend Boundary
 

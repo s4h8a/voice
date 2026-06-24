@@ -18,7 +18,7 @@ export class PaymentsService {
       data: {
         organizationId,
         leadId: input.leadId,
-        provider: 'mock',
+        provider: this.providers.getPaymentName(),
         providerPaymentId: link.providerPaymentId,
         paymentLink: link.paymentLink,
         amountPaise: input.amountPaise,

@@ -16,10 +16,10 @@ export default function DashboardPage() {
   return (
     <AppShell title="Dashboard">
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard icon={Wallet} label="Wallet balance" value="₹1,000" hint="First completed call is free. Paid calls default to ₹1/min." />
-        <StatCard icon={PhoneCall} label="Call minutes" value="318" hint="Usage includes demo calls and provider-reported durations." />
+        <StatCard icon={Wallet} label="Billing mode" value="Free beta" hint="No wallet deduction while BILLING_MODE=free." />
+        <StatCard icon={PhoneCall} label="Call minutes" value="318" hint="Usage includes live provider-reported durations." />
         <StatCard icon={Percent} label="Conversion rate" value="16.2%" hint="Calculated from converted and payment-completed outcomes." />
-        <StatCard icon={IndianRupee} label="Payments collected" value="₹1.1L" hint="INR payment links through UPI-capable gateways." />
+        <StatCard icon={IndianRupee} label="Call price" value="Rs 0/min" hint="Payment collection is off until launch." />
       </div>
       <div className="mt-5 grid gap-5 xl:grid-cols-[1fr_360px]">
         <RevenueChart />

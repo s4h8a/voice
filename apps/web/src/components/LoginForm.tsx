@@ -8,7 +8,7 @@ import { API_BASE } from '@/lib/api';
 export function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState('owner@example.com');
-  const [password, setPassword] = useState('Demo@123456');
+  const [password, setPassword] = useState('Start@123456');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 

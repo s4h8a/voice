@@ -7,9 +7,9 @@ The platform supports business profiles, lead upload/validation, campaign manage
 ## Business Rules
 
 - Currency: INR, stored internally as paise.
-- Default client price: Rs 1 per minute (`100` paise).
-- First completed call: free for each organization.
-- Recharge: client creates an INR/UPI-capable payment link. Wallet is credited after verified payment webhook.
+- Current beta billing: free calls while `BILLING_MODE=free`.
+- Launch billing later: set `BILLING_MODE=wallet`, then use Rs 1 per minute (`100` paise) or any admin-configured price.
+- Recharge/payment links are disabled until wallet billing is enabled.
 - Backend code: private server-side code only. Customers access the web app and API, not source code.
 - Compliance: consented leads only, opt-out enforced, DND-safe architecture, AI/call-recording disclosure controls, audit logs.
 
@@ -17,7 +17,7 @@ The platform supports business profiles, lead upload/validation, campaign manage
 
 - Frontend: Next.js, TypeScript, Tailwind CSS, Recharts, lucide-react
 - Backend: NestJS, TypeScript, Prisma, PostgreSQL, Redis/BullMQ
-- Providers: mock demo adapters plus Exotel/Twilio/Plivo, OpenRouter/OpenAI/Gemini/local model placeholders, Razorpay/Cashfree/PhonePe placeholders
+- Providers: Exotel/Twilio/Plivo, OpenRouter, Razorpay-ready wallet billing for launch mode
 - Deployment: Docker Compose
 
 ## Quick Start
@@ -58,10 +58,10 @@ npm run dev
 Web: `http://localhost:3000`
 API: `http://localhost:4000/api`
 
-Demo users:
+Starter users:
 
-- owner@example.com / Demo@123456
-- admin@example.com / Demo@123456
+- owner@example.com / Start@123456
+- admin@example.com / Start@123456
 
 ## OpenRouter Test Model
 
@@ -73,7 +73,72 @@ OPENROUTER_API_KEY=your-key
 OPENROUTER_MODEL=nvidia/nemotron-3-ultra-550b-a55b:free
 ```
 
-If no key is present, the backend falls back to demo deterministic responses.
+OpenRouter credentials are required when the backend needs LLM responses.
+
+## Enable Real Phone Dialing
+
+Real mode is enabled by selecting a live provider. India-first live dialing uses Exotel:
+
+```bash
+TELEPHONY_PROVIDER=exotel
+EXOTEL_REGION=mumbai
+EXOTEL_API_KEY=your_api_key
+EXOTEL_API_TOKEN=your_api_token
+EXOTEL_ACCOUNT_SID=your_account_sid
+EXOTEL_CALLER_ID=your_exophone_or_virtual_number
+```
+
+Then choose one live routing mode:
+
+```bash
+# Route customer to an Exotel flow/applet
+EXOTEL_FLOW_URL=http://my.exotel.com/YOUR_SID/exoml/start_voice/YOUR_APP_ID
+
+# Or bridge customer to your agent/handoff number
+EXOTEL_AGENT_NUMBER=+919999999999
+```
+
+Twilio live dialing:
+
+```bash
+TELEPHONY_PROVIDER=twilio
+TWILIO_ACCOUNT_SID=your_sid
+TWILIO_AUTH_TOKEN=your_token
+TWILIO_FROM_NUMBER=+1XXXXXXXXXX
+```
+
+Plivo live dialing:
+
+```bash
+TELEPHONY_PROVIDER=plivo
+PLIVO_AUTH_ID=your_auth_id
+PLIVO_AUTH_TOKEN=your_auth_token
+PLIVO_FROM_NUMBER=1415XXXXXXX
+PLIVO_ANSWER_URL=https://your-public-api.example.com/api/telephony/plivo/answer
+```
+
+Payments are disabled during free beta:
+
+```bash
+BILLING_MODE=free
+PAYMENT_PROVIDER=disabled
+```
+
+When ready to charge users, enable real Razorpay links:
+
+```bash
+BILLING_MODE=wallet
+PAYMENT_PROVIDER=razorpay
+RAZORPAY_KEY_ID=your_key_id
+RAZORPAY_KEY_SECRET=your_key_secret
+RAZORPAY_WEBHOOK_SECRET=your_webhook_secret
+```
+
+For Plivo webhooks or Exotel callbacks on a local machine, expose the API with a public URL and set:
+
+```bash
+PUBLIC_API_BASE_URL=https://your-public-api.example.com
+```
 
 ## Private Backend Deployment
 

@@ -260,7 +260,7 @@ model Call {
   campaign             Campaign     @relation(fields: [campaignId], references: [id])
   leadId               String
   lead                 Lead         @relation(fields: [leadId], references: [id])
-  provider             String       @default("mock")
+  provider             String       @default("external")
   providerCallId       String?
   status               CallStatus   @default(queued)
   outcome              LeadOutcome  @default(new)

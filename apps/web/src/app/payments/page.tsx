@@ -1,17 +1,16 @@
-import { IndianRupee, QrCode, Wallet } from 'lucide-react';
+import { CreditCard, ShieldCheck, Wallet } from 'lucide-react';
 import { AppShell } from '@/components/AppShell';
 import { DataTable } from '@/components/DataTable';
 import { StatusBadge } from '@/components/StatusBadge';
 
-const payments = [
-  { id: 'pay-1', customer: 'Aarav Sharma', amount: '₹999', status: 'link_sent', provider: 'Mock UPI', purpose: 'Course payment' },
-  { id: 'pay-2', customer: 'Priya Nair', amount: '₹500', status: 'paid', provider: 'Razorpay', purpose: 'Wallet recharge' },
-  { id: 'pay-3', customer: 'Demo Business', amount: '₹1,000', status: 'paid', provider: 'PhonePe', purpose: 'Wallet recharge' }
+const rows = [
+  { id: 'free-1', item: 'Test call', amount: 'Rs 0', status: 'completed', note: 'Free beta usage' },
+  { id: 'free-2', item: 'Campaign call', amount: 'Rs 0', status: 'completed', note: 'No wallet deduction while BILLING_MODE=free' },
 ];
 
 export default function PaymentsPage() {
   return (
-    <AppShell title="Payments">
+    <AppShell title="Billing">
       <div className="grid gap-5 xl:grid-cols-[420px_1fr]">
         <section className="rounded-md border border-line bg-white p-5">
           <div className="flex items-center gap-3">
@@ -19,41 +18,32 @@ export default function PaymentsPage() {
               <Wallet size={19} aria-hidden="true" />
             </span>
             <div>
-              <h2 className="text-lg font-semibold">Wallet recharge</h2>
-              <p className="text-sm text-muted">INR balance through UPI-capable gateways.</p>
+              <h2 className="text-lg font-semibold">Free beta mode</h2>
+              <p className="text-sm text-muted">No payment is required until the product is ready for launch.</p>
             </div>
           </div>
           <div className="mt-5 rounded-md border border-line bg-canvas p-4">
             <p className="text-sm text-muted">Current billing rule</p>
-            <p className="mt-1 text-3xl font-semibold">₹1/min</p>
-            <p className="mt-2 text-sm text-muted">Admin can change this per organization later.</p>
+            <p className="mt-1 text-3xl font-semibold">Rs 0/min</p>
+            <p className="mt-2 text-sm text-muted">Calls are free while `BILLING_MODE=free`. Wallet billing can be enabled later.</p>
           </div>
-          <form className="mt-5 space-y-4">
-            <label className="block">
-              <span className="text-sm font-medium">Recharge amount</span>
-              <div className="mt-1 flex rounded-md border border-line bg-white">
-                <span className="grid w-12 place-items-center border-r border-line text-muted">
-                  <IndianRupee size={17} aria-hidden="true" />
-                </span>
-                <input className="focus-ring w-full rounded-r-md px-3 py-3" defaultValue="1000" />
-              </div>
-            </label>
-            <button className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-md bg-brand px-4 py-3 text-sm font-semibold text-white">
-              <QrCode size={17} aria-hidden="true" />
-              Create UPI payment link
-            </button>
-          </form>
+          <div className="mt-5 flex gap-3 rounded-md border border-line p-3 text-sm text-muted">
+            <ShieldCheck size={18} className="shrink-0 text-brand" aria-hidden="true" />
+            <p>Payment links, recharge, and wallet deductions are disabled in beta. Real call provider costs are still charged by Exotel, Twilio, or Plivo directly.</p>
+          </div>
         </section>
         <section>
-          <h2 className="mb-3 text-lg font-semibold">Payment logs</h2>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Billing events</h2>
+            <CreditCard size={20} className="text-brand" aria-hidden="true" />
+          </div>
           <DataTable
-            rows={payments}
+            rows={rows}
             columns={[
-              { key: 'customer', label: 'Customer' },
+              { key: 'item', label: 'Item' },
               { key: 'amount', label: 'Amount' },
               { key: 'status', label: 'Status', render: (row) => <StatusBadge value={String(row.status)} /> },
-              { key: 'provider', label: 'Provider' },
-              { key: 'purpose', label: 'Purpose' }
+              { key: 'note', label: 'Note' },
             ]}
           />
         </section>

@@ -4,13 +4,13 @@ import * as bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  const passwordHash = await bcrypt.hash('Demo@123456', 10);
+  const passwordHash = await bcrypt.hash('Start@123456', 10);
   const org = await prisma.organization.upsert({
-    where: { id: 'demo-org-india' },
+    where: { id: 'starter-org-india' },
     update: {},
     create: {
-      id: 'demo-org-india',
-      name: 'Demo Indian Business',
+      id: 'starter-org-india',
+      name: 'Starter Indian Business',
       industry: 'education',
       wallet: {
         create: {

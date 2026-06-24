@@ -42,26 +42,27 @@ export class LeadsService {
       },
     });
     for (const row of parsed.filter((r) => r.valid)) {
+      const data = row as Record<string, any>;
       await this.prisma.lead.create({
         data: {
           organizationId,
           uploadBatchId: batch.id,
-          name: String(row.name),
+          name: String(data.name),
           phone: String(row.phone),
-          email: row.email ? String(row.email) : undefined,
-          city: row.city ? String(row.city) : undefined,
-          productInterest: row.product_interest ? String(row.product_interest) : undefined,
-          budget: row.budget ? String(row.budget) : undefined,
-          notes: row.notes ? String(row.notes) : undefined,
+          email: data.email ? String(data.email) : undefined,
+          city: data.city ? String(data.city) : undefined,
+          productInterest: data.product_interest ? String(data.product_interest) : undefined,
+          budget: data.budget ? String(data.budget) : undefined,
+          notes: data.notes ? String(data.notes) : undefined,
           consentStatus: 'consented',
-          preferredLanguage: row.preferred_language ? String(row.preferred_language) : undefined,
+          preferredLanguage: data.preferred_language ? String(data.preferred_language) : undefined,
         },
       });
     }
     return { batchId: batch.id, importedRows: report.validRows, ...report };
   }
 
-  private async parseSheet(file: Express.Multer.File, organizationId: string) {
+  private async parseSheet(file: Express.Multer.File, organizationId: string): Promise<Array<Record<string, any> & { phone: string; valid: boolean; errors: string[]; rowNumber: number }>> {
     if (!file) throw new BadRequestException('Missing file');
     const wb = XLSX.read(file.buffer, { type: 'buffer' });
     const sheet = wb.Sheets[wb.SheetNames[0]];

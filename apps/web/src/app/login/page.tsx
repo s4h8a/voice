@@ -11,7 +11,7 @@ export default function LoginPage() {
           </span>
           <div>
             <h1 className="text-xl font-semibold">Sign in</h1>
-            <p className="text-sm text-muted">Demo owner: owner@example.com / Demo@123456</p>
+            <p className="text-sm text-muted">Starter owner: owner@example.com / Start@123456</p>
           </div>
         </div>
         <LoginForm />

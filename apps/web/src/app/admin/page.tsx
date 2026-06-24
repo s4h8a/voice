@@ -4,7 +4,7 @@ import { DataTable } from '@/components/DataTable';
 import { StatusBadge } from '@/components/StatusBadge';
 
 const users = [
-  { id: 'u1', org: 'Demo Indian Business', owner: 'owner@example.com', status: 'active', wallet: '₹1,000' },
+  { id: 'u1', org: 'Starter Indian Business', owner: 'owner@example.com', status: 'active', wallet: 'Free beta' },
   { id: 'u2', org: 'Trial Retail', owner: 'retail@example.com', status: 'active', wallet: '₹320' },
   { id: 'u3', org: 'Suspended Test', owner: 'blocked@example.com', status: 'failed', wallet: '₹0' }
 ];
