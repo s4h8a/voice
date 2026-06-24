@@ -66,6 +66,8 @@ if (-not (Test-Path -LiteralPath ".env")) {
   Copy-Item -LiteralPath ".env.example" -Destination ".env"
 }
 
+Copy-Item -LiteralPath ".env" -Destination "apps\api\.env" -Force
+
 Write-Host "Installing npm dependencies..."
 npm install --no-audit --no-fund
 

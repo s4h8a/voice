@@ -38,6 +38,7 @@ What the installer does:
 
 - installs Node.js LTS, Git, and Docker Desktop if missing
 - creates `.env` from `.env.example`
+- copies `.env` into `apps/api/.env` for Prisma CLI commands
 - installs npm packages
 - starts PostgreSQL and Redis with Docker Compose
 - runs Prisma generate/migrate/seed

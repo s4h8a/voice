@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import { LogIn } from 'lucide-react';
+import { LoginForm } from '@/components/LoginForm';
 
 export default function LoginPage() {
   return (
@@ -14,19 +14,7 @@ export default function LoginPage() {
             <p className="text-sm text-muted">Demo owner: owner@example.com / Demo@123456</p>
           </div>
         </div>
-        <form className="mt-6 space-y-4">
-          <label className="block">
-            <span className="text-sm font-medium">Email</span>
-            <input className="focus-ring mt-1 w-full rounded-md border border-line px-3 py-3" defaultValue="owner@example.com" />
-          </label>
-          <label className="block">
-            <span className="text-sm font-medium">Password</span>
-            <input className="focus-ring mt-1 w-full rounded-md border border-line px-3 py-3" type="password" defaultValue="Demo@123456" />
-          </label>
-          <Link href="/dashboard" className="focus-ring flex w-full items-center justify-center rounded-md bg-brand px-4 py-3 text-sm font-semibold text-white">
-            Continue
-          </Link>
-        </form>
+        <LoginForm />
       </section>
     </main>
   );
