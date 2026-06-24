@@ -31,8 +31,7 @@ export class ExotelAdapter implements TelephonyProvider {
     const apiKey = requireEnv(this.config, 'EXOTEL_API_KEY');
     const apiToken = requireEnv(this.config, 'EXOTEL_API_TOKEN');
     const callerId = this.config.get<string>('EXOTEL_CALLER_ID');
-    const region = (this.config.get<string>('EXOTEL_REGION') || 'mumbai').toLowerCase();
-    const host = region === 'singapore' ? 'api.exotel.com' : 'api.in.exotel.com';
+    const host = exotelHost(this.config);
     const url = `https://${host}/v1/Accounts/${sid}/Calls/connect`;
     const params = new URLSearchParams();
     const flowUrl = this.config.get<string>('EXOTEL_FLOW_URL') || buildExotelFlowUrl(sid, this.config.get<string>('EXOTEL_APP_ID'));
@@ -66,8 +65,7 @@ export class ExotelAdapter implements TelephonyProvider {
     const sid = requireEnv(this.config, 'EXOTEL_ACCOUNT_SID');
     const apiKey = requireEnv(this.config, 'EXOTEL_API_KEY');
     const apiToken = requireEnv(this.config, 'EXOTEL_API_TOKEN');
-    const region = (this.config.get<string>('EXOTEL_REGION') || 'mumbai').toLowerCase();
-    const host = region === 'singapore' ? 'api.exotel.com' : 'api.in.exotel.com';
+    const host = exotelHost(this.config);
     const data = await getJson(`https://${host}/v1/Accounts/${sid}/Calls/${callId}`, basicAuth(apiKey, apiToken));
     return normalizeCallStatus(data?.Call?.Status || data?.Status || 'queued');
   }
@@ -356,6 +354,13 @@ function buildExotelFlowUrl(sid: string, appId?: string) {
   return appId ? `http://my.exotel.com/${sid}/exoml/start_voice/${appId}` : undefined;
 }
 
+function exotelHost(config: ConfigService) {
+  const explicit = config.get<string>('EXOTEL_SUBDOMAIN');
+  if (explicit) return explicit.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  const region = (config.get<string>('EXOTEL_REGION') || 'singapore').toLowerCase();
+  return region === 'mumbai' || region === 'india' ? 'api.in.exotel.com' : 'api.exotel.com';
+}
+
 function callbackUrl(config: ConfigService, path: string) {
   const base = config.get<string>('PUBLIC_API_BASE_URL');
   return base ? `${base.replace(/\/$/, '')}${path}` : undefined;
@@ -397,7 +402,18 @@ async function parseProviderResponse(res: Response) {
     data = { raw: text };
   }
   if (!res.ok) {
-    throw new BadGatewayException(`Telephony provider error ${res.status}: ${JSON.stringify(data).slice(0, 800)}`);
+    const message = extractProviderErrorMessage(data, text);
+    throw new BadGatewayException(`Telephony provider error ${res.status}: ${message}`);
   }
   return data;
+}
+
+function extractProviderErrorMessage(data: any, rawText: string) {
+  const fromJson = data?.message || data?.Message || data?.error || data?.Error || data?.RestException?.Message;
+  if (fromJson) return String(fromJson).slice(0, 800);
+  const xmlMessage = rawText.match(/<Message>([\s\S]*?)<\/Message>/i)?.[1];
+  const xmlDescription = rawText.match(/<Description>([\s\S]*?)<\/Description>/i)?.[1];
+  const message = xmlMessage || xmlDescription;
+  if (message) return message.replace(/\s+/g, ' ').trim().slice(0, 800);
+  return JSON.stringify(data).slice(0, 800);
 }
