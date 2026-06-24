@@ -30,7 +30,7 @@ export class ExotelAdapter implements TelephonyProvider {
     const sid = requireEnv(this.config, 'EXOTEL_ACCOUNT_SID');
     const apiKey = requireEnv(this.config, 'EXOTEL_API_KEY');
     const apiToken = requireEnv(this.config, 'EXOTEL_API_TOKEN');
-    const callerId = requireEnv(this.config, 'EXOTEL_CALLER_ID');
+    const callerId = this.config.get<string>('EXOTEL_CALLER_ID');
     const region = (this.config.get<string>('EXOTEL_REGION') || 'mumbai').toLowerCase();
     const host = region === 'singapore' ? 'api.exotel.com' : 'api.in.exotel.com';
     const url = `https://${host}/v1/Accounts/${sid}/Calls/connect`;
@@ -39,7 +39,7 @@ export class ExotelAdapter implements TelephonyProvider {
 
     if (flowUrl) {
       params.set('From', toE164India(lead.phone));
-      params.set('CallerId', callerId);
+      if (callerId) params.set('CallerId', callerId);
       params.set('Url', flowUrl);
       params.set('CallType', 'trans');
     } else {
@@ -47,7 +47,7 @@ export class ExotelAdapter implements TelephonyProvider {
       if (!agentNumber) throw new BadRequestException('EXOTEL_FLOW_URL or EXOTEL_AGENT_NUMBER is required for real Exotel calls');
       params.set('From', toE164India(agentNumber));
       params.set('To', toE164India(lead.phone));
-      params.set('CallerId', callerId);
+      if (callerId) params.set('CallerId', callerId);
       params.set('CallType', 'trans');
     }
 
