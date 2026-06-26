@@ -7,6 +7,7 @@ import {
   Headphones,
   LayoutDashboard,
   ListChecks,
+  LogIn,
   PhoneCall,
   Settings,
   ShieldCheck,
@@ -15,6 +16,7 @@ import {
 } from 'lucide-react';
 
 const nav = [
+  { href: '/login', label: 'Sign in', icon: LogIn },
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/business-profiles', label: 'Business', icon: Building2 },
   { href: '/leads', label: 'Leads', icon: Upload },
